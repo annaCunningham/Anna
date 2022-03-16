@@ -1,0 +1,83 @@
+import os 
+os.getcwd()
+
+## read the data from the spreadsheet ##
+
+import collections
+import re
+import csv 
+filename = "sales.csv"
+
+with open(filename,'r') as csv_file:
+    csvReader=csv.reader(csv_file)
+    
+    for row in csvReader:
+        print(row)
+    
+## collect all of the sales from each month into a single list ##
+
+combinedSales = []
+months = []
+
+with open(filename,'r') as csv_file:
+    csvReader=csv.reader(csv_file)
+    
+    next(csvReader)
+    
+    for line in csvReader:
+        combinedSales.append(line[2])
+        months.append((line[1]))
+        
+print(months)
+print(combinedSales)
+
+## output the total sales across all months ##
+
+intLists = map(int, combinedSales) #mapping the strings to integers 
+intValues = list(intLists)         #creating the list as a list of integers 
+print("The total of all sales is:    £" , sum(intValues))
+
+## calculate the average ##
+
+averageMonthlySale = (sum(intValues)) / (len(intValues))
+print("The average monthly sale is: £", round(averageMonthlySale,2))
+
+## finding the months with the highest and lowest sales ##
+
+import pandas as pd
+df = pd.DataFrame({"Month": months, "Total sales (£)": combinedSales})
+
+data = df.sort_values("Total sales (£)")
+data
+
+highestMonth = data['Month'].iloc[0]
+highestSale = data["Total sales (£)"].iloc[0]
+lowestMonth = data['Month'].iloc[(len(data)-1)]
+lowestSale = data["Total sales (£)"].iloc[(len(data)-1)]
+
+print("The month with the highest sales is: ", highestMonth,". Total sales equalled: £", highestSale)
+print("The month with the lowest sales is: ", lowestMonth,". Total sales equalled: £", lowestSale)
+
+## calculate monthly change as a percentage ##
+
+percentageChange = []    
+length = len(intValues) - 1 
+
+for change in range(len(intValues)):    
+    if change < length:
+        monthlyChange = ((intValues[(change+1)] - intValues[(change)])/(intValues[(change+1)]))*100
+        percentageChange.append(round(monthlyChange,1))
+
+#change percentageChange to be a list of integer values 
+intPercent = map(int,percentageChange)
+intChanges = list(intPercent)
+print(intChanges)
+
+months.remove("jan")
+import matplotlib.pyplot as plt
+plt.plot(months, intChanges, color='red', marker='o')
+plt.title('Percentage change in sales for each month',  fontsize=14)
+plt.xlabel('Month', fontsize=14)
+plt.ylabel('Percentage Change (%)', fontsize=14)
+plt.grid(True)
+plt.show()
